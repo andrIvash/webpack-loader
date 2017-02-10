@@ -1,0 +1,9 @@
+@import 's1.css';
+
+body {
+    background: green;
+    font-color: red;
+}
+div {
+    display: flex;
+}
