@@ -1,9 +1,25 @@
 @import 's1.css';
+$blue:   grey;
+
+@custom-media --small-viewport (max-width: 30em);
+
 
 body {
-    background: green;
+    background: $blue;
     font-color: red;
 }
 div {
     display: flex;
+
+}
+
+.main {
+
+    &_title {
+        color: $blue;
+    }
+
+    @media (--small-viewport) {
+        /* styles for small viewport */
+    }
 }

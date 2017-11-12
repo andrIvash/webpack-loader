@@ -2,31 +2,38 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const webpack = require('webpack');
+const path = require('path');
 
 config = {
-  context: __dirname + "/src",
+  context: path.resolve(__dirname, 'src'),
   entry: {
     app: ['./js/app.js', './js/events.js']
   },
-  output: {
-    //publicPath: '',        
-    filename: 'assets/scripts/[name].bundle.js',
-    path: __dirname + "/dist"    
+  output: {      
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'assets/scripts/[name].bundle.js'
+       
   },
   devServer: {
-    contentBase: __dirname + "/src",
-    stats: 'errors-only',
+    contentBase: path.join(__dirname, 'src'),
+    compress: true,
+    //stats: 'errors-only',
+    port: 3000,
+    proxy: {
+        "/data": "http://localhost:9000"
+    },
   },
+  
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      chunks: ['app', 'commons'],
+      chunks: ['app', 'common'],
       template: './templates/index.pug',
     }),
     new ExtractTextPlugin('assets/styles/[name].bundle.css'),
     new webpack.optimize.CommonsChunkPlugin({
-      name: "commons",
-      filename: "assets/scripts/commons.js",
+      name: 'common',
+      filename: 'assets/scripts/common.js',
       minChunks: 2
     })
   ],
@@ -39,10 +46,27 @@ config = {
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader?sourceMap=true&importLoaders=1,url=false!postcss-loader"
-        })
+        // use: ExtractTextPlugin.extract({
+        //   fallback: 'style-loader',
+        //   use: "css-loader?sourceMap=true&importLoaders=1,url=false!postcss-loader"
+        // }),
+        use: ['css-hot-loader'].concat(ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                  minimize: true,
+                  sourceMap: true,
+                  importLoaders: 1,
+                  url: false
+              }
+            },
+            {
+              loader: 'postcss-loader'
+            }
+          ]
+        })),
       },
       {
         test: /\.pug$/,
@@ -61,14 +85,20 @@ config = {
 
 module.exports = function(env) {
     if (env === 'production') {
-      config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false
-        },
-        sourceMap: true 
-      }));
-      config.plugins.push(new FaviconsWebpackPlugin('./favicon.png'));
       config.devtool = 'source-map';
+      config.plugins = config.plugins.concat([
+        new webpack.optimize.UglifyJsPlugin({
+          compress: {
+            warnings: false
+          },
+          sourceMap: true 
+        }),
+        //new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': 'production',
+        }),
+        //new FaviconsWebpackPlugin('./favicon.png')
+      ]);
     } 
     return config;
 }
