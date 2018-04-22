@@ -58,8 +58,7 @@ config = {
               options: {
                   minimize: true,
                   sourceMap: true,
-                  importLoaders: 1,
-                  url: false
+                  publicPath: '../',
               }
             },
             {
@@ -78,7 +77,18 @@ config = {
       {test: /\.(svg)$/, use: 'url-loader?limit=65000&mimetype=image/svg+xml&name=images/[name].[ext]'},
       {test: /\.(png)$/, use: 'url-loader?limit=100000&mimetype=image/png&name=images/[name].[ext]'},
       {test: /\.(jpg)$/, use: 'file-loader?name=images/[name].[ext]'},
-      {test: /\.(eot|ttf|woff|woff2)$/, use: 'file-loader?name=fonts/[name].[ext]'}
+      {
+        test: /\.(eot|ttf|woff|woff2)$/, 
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              publicPath: '../../',
+              name:'./assets/fonts/[name].[ext]'
+            }
+          } 
+        ]
+      }
     ]
   }
 };

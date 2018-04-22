@@ -3,6 +3,13 @@ $blue:   grey;
 
 @custom-media --small-viewport (max-width: 30em);
 
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Lato Regular'), local('Lato-Regular'),
+         url('../fonts/lato-v13-latin-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
 
 body {
     background: $blue;
@@ -17,6 +24,7 @@ div {
 
     &_title {
         color: $blue;
+        font-family: 'Lato';
     }
 
     @media (--small-viewport) {
